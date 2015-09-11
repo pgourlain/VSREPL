@@ -1,0 +1,30 @@
+﻿
+Hosting Editor
+http://dotneteers.net/blogs/divedeeper/archive/2010/07/28/LearnVSXNow_2D00_Part45.aspx
+https://github.com/ryanmolden/ToolWindowHostedEditorExample
+https://social.msdn.microsoft.com/Forums/en-US/19fc4ba1-061e-4da3-bf0c-1bd61cb0a94a/embed-vs-2010-code-editor-in-a-tool-window?forum=vsx
+https://social.msdn.microsoft.com/Forums/vstudio/fr-FR/c4a97e14-e70c-4daa-a1ee-e122c22e8709/hosting-an-code-editor-in-a-tool-window?forum=vsx
+
+
+ripping editor
+https://joshvarty.wordpress.com/2014/08/01/ripping-the-visual-studio-editor-apart-with-projection-buffers/
+
+
+How to: Host An Editor in Another Editor
+https://msdn.microsoft.com/en-us/library/bb165129.aspx
+
+intellisense
+https://social.msdn.microsoft.com/Forums/sqlserver/en-US/68e119af-4960-4561-a660-cf45538f1c33/vs-2010-hosting-the-c-editor-in-a-tool-window?forum=vsx
+
+
+Miscelaneous
+https://msdn.microsoft.com/en-us/library/ee372314.aspx
+
+
+https://gist.github.com/tomasr/88d86d087a2ee86af554
+
+
+http://www.mztools.com/articles/2015/MZ2015002.aspx
+http://vsxtra.codeplex.com/
+https://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.ivsuishell.createdocumentwindow.aspx
+
