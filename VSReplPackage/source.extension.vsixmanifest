@@ -3,9 +3,10 @@
   <Metadata>
     <Identity Id="VSReplPackage.Company.35069c79-ecb8-4d3f-a912-13fcfb3f56cb" Version="0.5.0" Language="en-US" Publisher="Pierrick Gourlain" />
     <DisplayName>CSharpReplEditor</DisplayName>
-    <Description xml:space="preserve">This extension provide an editor that allows you to extend VisualStudio in VisualStudio it self, by executing C# script using Roslyn script engine.</Description>
+    <Description xml:space="preserve">This extension provide an editor that allows you to execute C# script from Visual Studio. It use script engine of Roslyn.
+</Description>
     <Icon>Resources\ReplEditorPackage.ico</Icon>
-    <PreviewImage>Resources\Icon200.png</PreviewImage>
+    <PreviewImage>Resources\ScreenShot1.png</PreviewImage>
     <Tags>Roslyn, C#, Script, Visual Studio 2015</Tags>
   </Metadata>
   <Installation>

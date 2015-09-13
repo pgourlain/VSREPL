@@ -71,6 +71,7 @@
   <ItemGroup>
     <None Include="Key.snk" />
     <None Include="packages.config" />
+    <None Include="README.md" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -91,6 +92,15 @@
     </Content>
     <EmbeddedResource Include="SampleScript.cs" />
     <Content Include="Resources\Icon200.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\MenuScreenShot.png" />
+    <Content Include="Resources\ScreenShot.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\ScreenShot1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
