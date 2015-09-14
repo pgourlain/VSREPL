@@ -17,6 +17,7 @@ namespace VSReplPackage.Scripting
 {
     class VSTools
     {
+        static Guid GUID_ScriptEditorOutputWindowPane = new Guid("8ED8DFF5-EAAC-4222-B5AD-FECD608562BC");
         #region folder section
         public static string ScriptsDirectory
         {
@@ -56,6 +57,8 @@ namespace VSReplPackage.Scripting
             if (outWindow.GetPane(ref guidPane, out pane) != VSConstants.S_OK)
             {
                 outWindow.CreatePane(ref guidPane, defaultText, 1, 1);
+                outWindow.GetPane(ref guidPane, out pane);
+                pane.Activate();
             }
             return pane;
 
@@ -64,16 +67,15 @@ namespace VSReplPackage.Scripting
         {
             get
             {
-                IVsOutputWindowPane buildPane = GetPane(VSConstants.GUID_BuildOutputWindowPane, "Build");
+                IVsOutputWindowPane buildPane = GetPane(GUID_ScriptEditorOutputWindowPane, "Repl Script Editor");
                 return buildPane;
             }
         }
         static IVsOutputWindowPane DebugPane
         {
             get
-            {
-                IVsOutputWindowPane buildPane = GetPane(VSConstants.GUID_OutWindowDebugPane, "Debug");
-                return buildPane;
+            {               
+                return BuildPane;
             }
         }
 
@@ -97,19 +99,29 @@ namespace VSReplPackage.Scripting
             buildPane.OutputString(string.Format(CultureInfo.InvariantCulture, "========== Roslyn script: execution {0}: {1} =========={2}", failed ? "failed" : "succeeded", DateTime.Now, Environment.NewLine));
             buildPane.Activate(); // Brings this pane into view
         }
+
+        internal static void ActivateLogWindow()
+        {
+            BuildPane.Activate();
+        }
+
         internal static void LogDebug(string message)
         {
-            DebugPane.OutputString(message);
+            BuildPane.OutputString(message);
+        }
+        internal static void LogDebug(string fmt, params object[] args)
+        {
+            BuildPane.OutputString(string.Format(CultureInfo.InvariantCulture, fmt, args));
         }
 
         internal static void LogDebugError(Exception ex)
         {
-            DebugPane.OutputString(ex.ToString() + Environment.NewLine);
+            BuildPane.OutputString(ex.ToString() + Environment.NewLine);
         }
 
         #endregion
 
-        static void SaveAs(string oldFileName, ref string newScriptName, IComponentModel comp)
+        static void SaveAs(string oldFileName, ref string newScriptName, IServiceProvider site)
         {
             //make sure that fileName has .cs extension
             newScriptName = System.IO.Path.ChangeExtension(newScriptName, ".cs");
@@ -119,29 +131,59 @@ namespace VSReplPackage.Scripting
             oldFileName = System.IO.Path.Combine(VSTools.ScriptsDirectory, oldFileName);
             var newFileName = System.IO.Path.Combine(VSTools.ScriptsDirectory, newScriptName);
 
-            var site = comp.GetService<IServiceProvider>();
             VsShellUtilities.RenameDocument(site, oldFileName, newFileName);
         }
 
         internal static void SaveAs(IWpfTextViewHost host, string oldScriptName, ref string fileName)
         {
-            var comp = (Microsoft.VisualStudio.ComponentModelHost.IComponentModel)Package.GetGlobalService(typeof(Microsoft.VisualStudio.ComponentModelHost.SComponentModel));
-            var svc = comp.GetService<IVsEditorAdaptersFactoryService>();
-            var view = svc.GetViewAdapter(host.TextView);
-            IVsTextLines vsTextLines;
-            ErrorHandler.ThrowOnFailure(view.GetBuffer(out vsTextLines));
-            IVsPersistDocData2 vsPersistDocData = (IVsPersistDocData2)vsTextLines;
-            SaveAs(oldScriptName, ref fileName, comp);
+            IVsPersistDocData vsPersistDocData = GetPersistDocData(host);
+            SaveAs(oldScriptName, ref fileName, ServiceProvider.GlobalProvider);             
             if (vsPersistDocData != null)
             {
-                string newDoc;
-                int saveCanceled;
-                if (vsPersistDocData.SaveDocData(VSSAVEFLAGS.VSSAVE_Save, out newDoc, out saveCanceled) != VSConstants.S_OK)
-                {
-                    System.Diagnostics.Trace.WriteLine("error while saving C# script document");
-                }
+                Save(vsPersistDocData);
             }
         }
 
+        private static IVsEditorAdaptersFactoryService _EditorAdaptersFactoryService;
+        private static IVsEditorAdaptersFactoryService EditorAdaptersFactoryService
+        {
+            get
+            {
+                if (_EditorAdaptersFactoryService == null)
+                {
+                    var comp = (Microsoft.VisualStudio.ComponentModelHost.IComponentModel)Package.GetGlobalService(typeof(Microsoft.VisualStudio.ComponentModelHost.SComponentModel));
+                    _EditorAdaptersFactoryService = comp.GetService<IVsEditorAdaptersFactoryService>();
+                }
+                return _EditorAdaptersFactoryService;
+            }
+        }
+
+        internal static IVsPersistDocData GetPersistDocData(IWpfTextViewHost host)
+        {
+            var svc = EditorAdaptersFactoryService;
+            if (svc == null) LogDebug("unable to get service 'EditorAdaptersFactoryService'");
+            var view = svc.GetViewAdapter(host.TextView);
+            IVsTextLines vsTextLines;
+            ErrorHandler.ThrowOnFailure(view.GetBuffer(out vsTextLines));
+            IVsPersistDocData vsPersistDocData = (IVsPersistDocData)vsTextLines;
+            return vsPersistDocData;
+        }
+
+        internal static bool IsDirty(IVsPersistDocData docData)
+        {
+            int pfDirty;
+            ErrorHandler.ThrowOnFailure(docData.IsDocDataDirty(out pfDirty));
+            return pfDirty > 0;
+        }
+
+        internal static void Save(IVsPersistDocData docData)
+        {
+            int canceled;
+            string newDocumentStateScope;
+            if (docData.SaveDocData(VSSAVEFLAGS.VSSAVE_Save, out newDocumentStateScope, out canceled) != VSConstants.S_OK)
+            {
+                LogDebug("error while saving C# script document");
+            }
+        }
     }
 }

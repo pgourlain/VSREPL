@@ -6,6 +6,12 @@
              xmlns:local="clr-namespace:VSReplPackage"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.CommandBindings>
+        <CommandBinding Command="Save" CanExecute="CommandBinding_CanExecute" Executed="CommandBinding_Executed" />
+    </UserControl.CommandBindings>
+    <UserControl.Resources>
+        <BitmapImage x:Key="saveKey" UriSource="Resources/saveIcon.png"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -17,6 +23,12 @@
         <ToolBar Grid.Row="0">
             <Button Command="{Binding RunCommand}" Content="Run script" ToolTip="Run this script using Roslyn script engine, you can see output result in the 'Output' window and 'Build' category">
                 <!--<Image Source=""/>-->
+            </Button>
+            <Button x:Name="bSave" Command="Save" ToolTip="Save this script">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Save" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource saveKey}" VerticalAlignment="Center"/>
+                </StackPanel>
             </Button>
             <Separator/>
             <TextBlock Text="Script name" VerticalAlignment="Center"/>

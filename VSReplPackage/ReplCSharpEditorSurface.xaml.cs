@@ -24,11 +24,12 @@ using VSReplPackage.Scripting;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Shell;
+using System.Diagnostics;
 
 namespace VSReplPackage
 {
     /// <summary>
-    /// Interaction logic for ReplCSharpEditorSurface.xaml
+    /// Interaction logic for ReplCSharpEditorSurface.xaml 
     /// </summary>
     public partial class ReplCSharpEditorSurface : UserControl, INotifyPropertyChanged
     {
@@ -38,6 +39,7 @@ namespace VSReplPackage
         IWpfTextViewHost _TextViewHost;
         IVsWindowFrame _childWindowFrame;
         IVsWindowFrame parentWindowFrame;
+        IVsPersistDocData _docData;
 
         bool _runningInProgress = true;
         public ReplCSharpEditorSurface()
@@ -80,10 +82,17 @@ namespace VSReplPackage
             string fileName = Microsoft.VisualBasic.Interaction.InputBox("New script name", "Save script As", _CurrentScriptName, -1, -1);
             if (!string.IsNullOrEmpty(fileName))
             {
-                VSTools.SaveAs(_TextViewHost, _CurrentScriptName, ref fileName);
-                _ScriptNameEntries = null;
-                _CurrentScriptName = fileName;
-                NotifyPropertyChanged(string.Empty);
+                try {
+                    VSTools.SaveAs(_TextViewHost, _CurrentScriptName, ref fileName);
+                    _ScriptNameEntries = null;
+                    _CurrentScriptName = fileName;
+                    NotifyPropertyChanged(string.Empty);
+                }
+                catch(Exception ex)
+                {
+                    VSTools.LogDebug("ScriptSaveAs Failed : {0}{1}", ex, Environment.NewLine);
+                    VSTools.ActivateLogWindow();
+                }
             }
         }
         private void LoadScript(string scriptName)
@@ -94,6 +103,7 @@ namespace VSReplPackage
             }
             _TextViewHost = null;
             _ViewAdapter = null;
+            _docData = null;
             HostCSharpEditor();
         }
         #endregion
@@ -221,9 +231,33 @@ namespace VSReplPackage
                 _ViewAdapter = VsShellUtilities.GetTextView(ppWindowFrame);
                 _childWindowFrame = ppWindowFrame;
                 _TextViewHost = _EditorAdapterFactory.GetWpfTextViewHost(_ViewAdapter);
+                _docData = VSTools.GetPersistDocData(_TextViewHost);
                 this.leftSide.Content = _TextViewHost;
             }
         }
         #endregion
+
+        private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (e.Source == this)
+            {
+                e.CanExecute = IsDirtyDocument();
+                e.Handled = true;
+            }
+            else
+            {
+                Trace.WriteLine("e.Source is not this");
+            }
+        }
+
+        private bool IsDirtyDocument()
+        {
+            return VSTools.IsDirty(_docData);
+        }
+
+        private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            VSTools.Save(_docData);
+        }
     }
 }

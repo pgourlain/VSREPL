@@ -199,6 +199,7 @@ namespace VSReplPackage
         int IOleCommandTarget.QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds,
           IntPtr pCmdText)
         {
+            //File.SaveSelectedItemsAs:{ 5EFC7975 - 14BC - 11CF - 9B2B - 00AA00573819}:226
             var hr = (int)Microsoft.VisualStudio.OLE.Interop.Constants.OLECMDERR_E_NOTSUPPORTED;
             if (_surface != null && _surface._ViewAdapter != null)
             {

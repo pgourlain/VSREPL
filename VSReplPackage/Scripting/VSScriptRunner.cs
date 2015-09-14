@@ -12,6 +12,7 @@ namespace VSReplPackage.Scripting
 {
     class VSScriptRunner
     {
+        #region static
         static string[] defaultReferences = { "System", "system.core", "mscorlib", "Microsoft.CSharp", "EnvDte", "EnvDTE100",
         "Microsoft.VisualStudio.Shell.14.0",
         "Microsoft.VisualStudio.Shell.Interop",
@@ -30,14 +31,13 @@ namespace VSReplPackage.Scripting
         static VSScriptRunner()
         {
             var VsDir = Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]);
-            Trace.WriteLine("VSDir : " + VsDir);
             //TODO: find location of Visual Studio installation
             //location of package
             var path = System.IO.Path.GetDirectoryName(typeof(CSharpScript).Assembly.Location);
             var options = ScriptOptions.Default.WithBaseDirectory(path)
                 .WithSearchPaths(
-                @"c:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\PublicAssemblies",
-                @"c:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\PrivateAssemblies");
+                Path.Combine(VsDir, "PublicAssemblies"),
+                Path.Combine(VsDir, "PrivateAssemblies"));
             options = options.AddReferences(typeof(CSharpScript).Assembly,
                 typeof(EnvDTE.TextSelection).Assembly,
                 typeof(EnvDTE.DTE).Assembly);
@@ -45,9 +45,13 @@ namespace VSReplPackage.Scripting
             options = options.WithNamespaces(defaultNamespaces);
             defaultOptions = options;
         }
+        #endregion
+
+        ConsoleRedirect _consoleRedirect=null;
 
         public void Run(string sCode, Action<object, Exception> executionEnd)
         {
+            _consoleRedirect = new ConsoleRedirect();
             VSTools.LogStartRunning();
             try
             {
@@ -58,6 +62,7 @@ namespace VSReplPackage.Scripting
             }
             catch(Exception ex)
             {
+                _consoleRedirect.Dispose();
                 VSTools.LogError(ex);
                 VSTools.LogEndRunning(true);
                 executionEnd(null, ex);
@@ -65,6 +70,7 @@ namespace VSReplPackage.Scripting
         }
         private void OnException(Task<ScriptState<object>> t, object state)
         {
+            _consoleRedirect.Dispose();
             var ex = t.Exception;
             VSTools.LogError(ex);
             VSTools.LogEndRunning(true);
@@ -74,6 +80,7 @@ namespace VSReplPackage.Scripting
 
         private void OnSuccess(Task<ScriptState<object>> t, object state)
         {
+            _consoleRedirect.Dispose();
             var result = t.IsCompleted ? t.Result : null;
             var exception = t.IsFaulted ? t.Exception : null;
             VSTools.LogEndRunning(t.IsFaulted);
