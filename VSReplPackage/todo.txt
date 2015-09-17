@@ -28,3 +28,5 @@ http://www.mztools.com/articles/2015/MZ2015002.aspx
 http://vsxtra.codeplex.com/
 https://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.ivsuishell.createdocumentwindow.aspx
 
+Hosting Editor outside Visual Studio
+https://github.com/SLaks/VSEmbed
