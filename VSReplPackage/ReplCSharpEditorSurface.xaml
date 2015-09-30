@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:VSReplPackage"
+             xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.CommandBindings>
@@ -20,11 +21,13 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <ToolBar Grid.Row="0">
-            <Button Command="{Binding RunCommand}" Content="Run script" ToolTip="Run this script using Roslyn script engine, you can see output result in the 'Output' window and 'Build' category">
+        <ToolBar Grid.Row="0" Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" 
+                 Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}">
+            <Button Command="{Binding RunCommand}" Content="Run script" ToolTip="Run this script using Roslyn script engine, you can see output result in the 'Output' window and 'Build' category"
+                    Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}">
                 <!--<Image Source=""/>-->
             </Button>
-            <Button x:Name="bSave" Command="Save" ToolTip="Save this script">
+            <Button x:Name="bSave" Command="Save" ToolTip="Save this script" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Save" Margin="0,0,5,0" VerticalAlignment="Center"/>
                     <Image Source="{StaticResource saveKey}" VerticalAlignment="Center"/>
@@ -32,9 +35,17 @@
             </Button>
             <Separator/>
             <TextBlock Text="Script name" VerticalAlignment="Center"/>
-            <ComboBox Width="150"
-                      ItemsSource="{Binding ScriptNameEntries}" SelectedValue="{Binding CurrentScriptName}"/>
-            <Button x:Name="bSaveAs" Content="Save As" Click="ScriptSaveAs" ToolTip="Save this script with a specific name"/>
+            <!--Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
+                      Background="{DynamicResource {x:Static vsfx:VsBrushes.DropDownBackgroundKey}}"
+                      BorderBrush="{DynamicResource {x:Static vsfx:VsBrushes.DropDownBorderKey}}"-->
+            <ComboBox Width="150" 
+                      Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
+                      Background="{DynamicResource {x:Static vsfx:VsBrushes.DropDownBackgroundKey}}"
+                      BorderBrush="{DynamicResource {x:Static vsfx:VsBrushes.DropDownBorderKey}}"                      
+                      ItemsSource="{Binding ScriptNameEntries}" SelectedValue="{Binding CurrentScriptName}"
+                      />
+            <Button x:Name="bSaveAs" Content="Save As" Click="ScriptSaveAs" ToolTip="Save this script with a specific name"
+                    Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"/>
         </ToolBar>
         <ContentControl Name="leftSide" Grid.Column="0" Grid.Row="1">
 
