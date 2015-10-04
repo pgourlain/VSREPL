@@ -13,7 +13,7 @@ namespace VSReplPackage.Scripting
     class VSScriptRunner
     {
         #region static
-        static string[] defaultReferences = { "System", "system.core", "mscorlib", "Microsoft.CSharp", "EnvDte", "EnvDTE100",
+        internal static string[] defaultReferences = { "System", "system.core", "mscorlib", "Microsoft.CSharp", "EnvDte", "EnvDTE100",
         "Microsoft.VisualStudio.Shell.14.0",
         "Microsoft.VisualStudio.Shell.Interop",
         "Microsoft.VisualStudio.Shell.Interop.10.0",
@@ -21,10 +21,13 @@ namespace VSReplPackage.Scripting
         "Microsoft.VisualStudio.Shell.Interop.12.0",
         "Microsoft.VisualStudio.Shell.Interop.8.0",
         "Microsoft.VisualStudio.Shell.Interop.9.0",
+        "Microsoft.VisualStudio.ComponentModelHost",
+        "System.ComponentModel.Composition"
         };
-        static string[] defaultNamespaces = { "System", "System.Linq", "System.Text", "System.Collections.Generic",
+        internal static string[] defaultNamespaces = { "System", "System.Linq", "System.Text", "System.Collections.Generic",
             "System.Diagnostics", "System.IO", "EnvDTE",
-            "Microsoft.VisualStudio","Microsoft.VisualStudio.Shell", "Microsoft.VisualStudio.Shell.Interop"
+            "Microsoft.VisualStudio","Microsoft.VisualStudio.Shell", "Microsoft.VisualStudio.Shell.Interop",
+            "System.ComponentModel.Composition.Hosting"
         };
 
         static ScriptOptions defaultOptions;
@@ -41,9 +44,28 @@ namespace VSReplPackage.Scripting
             options = options.AddReferences(typeof(CSharpScript).Assembly,
                 typeof(EnvDTE.TextSelection).Assembly,
                 typeof(EnvDTE.DTE).Assembly);
-            options = options.WithReferences(defaultReferences);
-            options = options.WithNamespaces(defaultNamespaces);
             defaultOptions = options;
+        }
+
+        public static void UpdateDefaultOptions(ReplAssembliesReferencesOptionsModel userOptions)
+        {
+            var VsDir = Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]);
+            //TODO: find location of Visual Studio installation
+            //location of package
+            var path = System.IO.Path.GetDirectoryName(typeof(CSharpScript).Assembly.Location);
+            var options = ScriptOptions.Default.WithBaseDirectory(path)
+                .WithSearchPaths(
+                Path.Combine(VsDir, "PublicAssemblies"),
+                Path.Combine(VsDir, "PrivateAssemblies"))
+                .WithReferences("System", "system.core", "mscorlib", "Microsoft.CSharp","Microsoft.VisualStudio.ComponentModelHost","System.ComponentModel.Composition");
+            if (userOptions != null)
+            {
+                options = options.AddSearchPaths(userOptions.SearchPaths);
+                options = options.WithReferences(userOptions.References);
+                options = options.WithNamespaces(userOptions.Namespaces);
+                defaultOptions = options;
+            }
+
         }
         #endregion
 

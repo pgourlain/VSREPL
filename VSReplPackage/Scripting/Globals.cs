@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
@@ -19,10 +20,12 @@ namespace VSReplPackage.Scripting
         public Globals()
         {
             this.DTE = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
+            this.MEF = (Microsoft.VisualStudio.ComponentModelHost.IComponentModel2)Package.GetGlobalService(typeof(Microsoft.VisualStudio.ComponentModelHost.SComponentModel));
         }
 
         #region Variables
         public EnvDTE.DTE DTE;
+        public IComponentModel2 MEF;
         #endregion
 
         //if the script ends with a call to a void method, an error occured. So in order to avoid this error, my methods always return an int

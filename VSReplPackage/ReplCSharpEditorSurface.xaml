@@ -46,6 +46,10 @@
                       />
             <Button x:Name="bSaveAs" Content="Save As" Click="ScriptSaveAs" ToolTip="Save this script with a specific name"
                     Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"/>
+            <Button Click="GotoSettings">
+                <Image Source="Resources/Settings.png"/>
+            </Button>
+
         </ToolBar>
         <ContentControl Name="leftSide" Grid.Column="0" Grid.Row="1">
 

@@ -35,6 +35,7 @@ namespace VSReplPackage
     /// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
     /// </para>
     /// </remarks>
+    [ProvideOptionPage(typeof(ReplAssembliesReferencesOptions), Constants.OptionPageCategoryName, Constants.OptionPageName, 113, 114, true)]
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
     [ProvideMenuResource("Menus.ctmenu", 1)]
@@ -71,6 +72,11 @@ namespace VSReplPackage
             CurrentPackage = this;
             ReplEditorCommand.Initialize(this);
             base.Initialize();
+        }
+
+        internal void ShowOptionPage()
+        {
+            this.ShowOptionPage(typeof(ReplAssembliesReferencesOptions));
         }
 
         #endregion

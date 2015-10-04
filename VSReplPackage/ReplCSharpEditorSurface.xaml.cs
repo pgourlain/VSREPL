@@ -259,5 +259,10 @@ namespace VSReplPackage
         {
             VSTools.Save(_docData);
         }
+
+        private void GotoSettings(object sender, RoutedEventArgs e)
+        {
+            ReplEditorPackage.CurrentPackage.ShowOptionPage();
+        }
     }
 }
